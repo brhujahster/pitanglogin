@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -20,10 +21,10 @@ public class User {
 	
 	@NotNull
 	@Column(name = "first_name")
-	private String firstName;
+	private String first_name;
 	
 	@Column(name = "last_name")
-	private String lastName;
+	private String last_name;
 	
 	@NotNull
 	private String email;
@@ -32,6 +33,7 @@ public class User {
 	private String password;
 	
 	@NotNull
+	@OneToMany
 	private List<Phone> phones;
 
 	public Long getId() {
@@ -42,12 +44,20 @@ public class User {
 		this.id = id;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFirst_name() {
+		return first_name;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFirst_name(String first_name) {
+		this.first_name = first_name;
+	}
+
+	public String getLast_name() {
+		return last_name;
+	}
+
+	public void setLast_name(String last_name) {
+		this.last_name = last_name;
 	}
 
 	public String getEmail() {
@@ -66,13 +76,7 @@ public class User {
 		this.password = password;
 	}
 
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+	
 
 	public List<Phone> getPhones() {
 		return phones;
@@ -106,6 +110,8 @@ public class User {
 			return false;
 		return true;
 	}
+
+	
 	
 	
 }

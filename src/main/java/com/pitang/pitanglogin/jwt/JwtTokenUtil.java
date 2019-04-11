@@ -51,9 +51,6 @@ public class JwtTokenUtil implements Serializable{
 		return expiration;
 	}
 	
-	
-	
-	
 	private Claims getClaimsFromToken(String token) {
 		Claims claims;
 		

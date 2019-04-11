@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.pitang.pitanglogin.model.User;
-import com.softengine.helpdesk.api.enums.ProfileEnum;
 
 public class JwtUserFactory {
 
@@ -19,13 +18,13 @@ public class JwtUserFactory {
 				user.getId(), 
 				user.getEmail(), 
 				user.getPassword(), 
-				mapToGranteAuthorities(user.getProfile()));
+				mapToGranteAuthorities());
 	}
 
 
-	private static List<GrantedAuthority> mapToGranteAuthorities(ProfileEnum profile) {
+	private static List<GrantedAuthority> mapToGranteAuthorities() {
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(profile.toString()));
+		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 		return authorities;
 	}
 }

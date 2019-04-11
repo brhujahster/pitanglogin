@@ -18,10 +18,10 @@ public class Phone {
 	private int number;
 	
 	@Column(name = "area_code")
-	private int areaCode;
+	private int area_code;
 	
 	@Column(name = "country_code")
-	private String countryCode;
+	private String country_code;
 
 	public Long getId() {
 		return id;
@@ -39,30 +39,23 @@ public class Phone {
 		this.number = number;
 	}
 
-	public int getAreaCode() {
-		return areaCode;
+	public int getArea_code() {
+		return area_code;
 	}
 
-	public void setAreaCode(int areaCode) {
-		this.areaCode = areaCode;
+	public void setArea_code(int area_code) {
+		this.area_code = area_code;
 	}
 
-	public String getCountryCode() {
-		return countryCode;
+	public String getCountry_code() {
+		return country_code;
 	}
 
-	public void setCountryCode(String countryCode) {
-		this.countryCode = countryCode;
+	public void setCountry_code(String country_code) {
+		this.country_code = country_code;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -72,17 +65,24 @@ public class Phone {
 		if (getClass() != obj.getClass())
 			return false;
 		Phone other = (Phone) obj;
-		if (areaCode != other.areaCode)
+		if (area_code != other.area_code)
 			return false;
-		if (countryCode == null) {
-			if (other.countryCode != null)
+		if (country_code == null) {
+			if (other.country_code != null)
 				return false;
-		} else if (!countryCode.equals(other.countryCode))
+		} else if (!country_code.equals(other.country_code))
 			return false;
 		if (number != other.number)
 			return false;
 		return true;
 	}
+
+	  @Override public int hashCode() { final int prime = 31; int result = 1;
+	  result = prime * result + ((id == null) ? 0 : id.hashCode()); return result;
+	  }
+	 
+
+	
 	
 	
 	
