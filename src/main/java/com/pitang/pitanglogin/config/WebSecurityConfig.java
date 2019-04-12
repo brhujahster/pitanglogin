@@ -30,10 +30,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
-	@Autowired
-	public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-		authenticationManagerBuilder.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
 	}
+	
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -50,8 +51,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                     "/**/*.css",
                     "/**/*.js"
 					).permitAll()
-			.antMatchers("/signin**").permitAll()
-			.antMatchers("/signup").permitAll()
+			.antMatchers("/signin/**").permitAll()
+			.antMatchers("/signup/**").permitAll()
+			.antMatchers("/h2/**").permitAll()
 			.anyRequest().authenticated();
 		http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.headers().cacheControl();

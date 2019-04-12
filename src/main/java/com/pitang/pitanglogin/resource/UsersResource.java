@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pitang.pitanglogin.jwt.CurrentUser;
 import com.pitang.pitanglogin.jwt.JwtAuthenticationRequest;
 import com.pitang.pitanglogin.jwt.JwtTokenUtil;
+import com.pitang.pitanglogin.jwt.UserOfSystem;
 import com.pitang.pitanglogin.model.User;
 import com.pitang.pitanglogin.repository.Users;
 import com.pitang.pitanglogin.service.UsersService;
@@ -58,8 +60,10 @@ public class UsersResource {
 	}
 	
 	@GetMapping("/me")
-	public void myProfile() {
-		
+	public ResponseEntity<?> myProfile(@AuthenticationPrincipal UserOfSystem user) {
+		User userLoged = users.returnAllOfUser(user.getUser().getId());
+		System.out.println("------- id do usuario " + userLoged.getId());
+		return ResponseEntity.ok(userLoged);
 	}
 	
 	private ResponseEntity<?> returnTokenForUser(JwtAuthenticationRequest authenticationRequest) {
