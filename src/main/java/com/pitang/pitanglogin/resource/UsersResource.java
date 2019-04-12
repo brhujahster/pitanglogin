@@ -1,5 +1,7 @@
 package com.pitang.pitanglogin.resource;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import com.pitang.pitanglogin.jwt.CurrentUser;
 import com.pitang.pitanglogin.jwt.JwtTokenUtil;
 import com.pitang.pitanglogin.model.User;
 import com.pitang.pitanglogin.repository.Users;
+import com.pitang.pitanglogin.service.UsersService;
 
 @RestController
 public class UsersResource {
@@ -34,6 +37,9 @@ public class UsersResource {
 	private AuthenticationManager authenticationManager;
 	
 	@Autowired
+	private UsersService usersService;
+	
+	@Autowired
 	private Users users;
 	
 	@PostMapping("/signup")
@@ -42,8 +48,10 @@ public class UsersResource {
 		if(result.hasErrors()) {
 			System.out.println("----- Existem campos inválidos");
 		}
+		usersService.save(user);
+		
 		System.out.println("Usuario que chegou " + user);
-		return null;
+		return returnTokenForUser(user);
 	}
 	
 	@GetMapping("/me")
@@ -51,19 +59,20 @@ public class UsersResource {
 		
 	}
 	
-	private CurrentUser returnTokenForUser(User user) {
+	private ResponseEntity<?> returnTokenForUser(User user) {
+		User userRecuperado = null;
 		
 		final Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-						user.getEmail(), user.getPassword()
-					)
-			);
-		
+				new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+				);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 		final String token = jwtTokenUtil.generatedToken(userDetails);
-		user.setPassword(null);
-		
-		return new CurrentUser(token, user);
+		final Optional<User> user2 = users.findByEmail(user.getEmail());
+		if(user2.isPresent()) {
+			userRecuperado = user2.get();
+		}
+		userRecuperado.setPassword(null);
+		return ResponseEntity.ok(new CurrentUser(token, userRecuperado));
 	}
 }

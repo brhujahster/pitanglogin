@@ -33,7 +33,7 @@ public class User {
 	private String password;
 	
 	@NotNull
-	@OneToMany
+	@OneToMany(mappedBy = "user")
 	private List<Phone> phones;
 
 	public Long getId() {
