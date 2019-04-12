@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pitang.pitanglogin.exceptions.InvalidFieldsException;
 import com.pitang.pitanglogin.jwt.CurrentUser;
 import com.pitang.pitanglogin.jwt.JwtAuthenticationRequest;
 import com.pitang.pitanglogin.jwt.JwtTokenUtil;
@@ -51,11 +52,11 @@ public class UsersResource {
 		authenticationRequest.setEmail(user.getEmail());
 		authenticationRequest.setPassword(user.getPassword());
 		if(result.hasErrors()) {
-			System.out.println("----- Existem campos inválidos");
+			System.out.println(result);
+			throw new InvalidFieldsException("Invalid Fields");
 		}
 		usersService.save(user);
 		
-		System.out.println("Usuario que chegou " + user);
 		return returnTokenForUser(authenticationRequest);
 	}
 	

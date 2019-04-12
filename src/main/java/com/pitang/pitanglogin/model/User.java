@@ -1,5 +1,6 @@
 package com.pitang.pitanglogin.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -9,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -19,18 +21,22 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotNull
+	@NotBlank
 	@Column(name = "first_name")
 	private String first_name;
 	
+	@NotBlank
 	@Column(name = "last_name")
 	private String last_name;
 	
-	@NotNull
+	@NotBlank
 	private String email;
 	
 	@NotNull
 	private String password;
+	
+	@Column(name = "created_at")
+	private LocalDate created_at;
 	
 	@NotNull
 	@OneToMany(mappedBy = "user")
@@ -84,6 +90,14 @@ public class User {
 
 	public void setPhones(List<Phone> phones) {
 		this.phones = phones;
+	}
+
+	public LocalDate getCreated_at() {
+		return created_at;
+	}
+
+	public void setCreated_at(LocalDate created_at) {
+		this.created_at = created_at;
 	}
 
 	@Override
