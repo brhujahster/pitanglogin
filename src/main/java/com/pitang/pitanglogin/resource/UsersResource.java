@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pitang.pitanglogin.jwt.CurrentUser;
+import com.pitang.pitanglogin.jwt.JwtAuthenticationRequest;
 import com.pitang.pitanglogin.jwt.JwtTokenUtil;
 import com.pitang.pitanglogin.model.User;
 import com.pitang.pitanglogin.repository.Users;
@@ -44,14 +45,16 @@ public class UsersResource {
 	
 	@PostMapping("/signup")
 	public ResponseEntity<?> signUp(@Valid @RequestBody User user, BindingResult result) {
-		
+		JwtAuthenticationRequest authenticationRequest = new JwtAuthenticationRequest();
+		authenticationRequest.setEmail(user.getEmail());
+		authenticationRequest.setPassword(user.getPassword());
 		if(result.hasErrors()) {
 			System.out.println("----- Existem campos inválidos");
 		}
 		usersService.save(user);
 		
 		System.out.println("Usuario que chegou " + user);
-		return returnTokenForUser(user);
+		return returnTokenForUser(authenticationRequest);
 	}
 	
 	@GetMapping("/me")
@@ -59,16 +62,16 @@ public class UsersResource {
 		
 	}
 	
-	private ResponseEntity<?> returnTokenForUser(User user) {
+	private ResponseEntity<?> returnTokenForUser(JwtAuthenticationRequest authenticationRequest) {
 		User userRecuperado = null;
 		
 		final Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+				new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
 				);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 		final String token = jwtTokenUtil.generatedToken(userDetails);
-		final Optional<User> user2 = users.findByEmail(user.getEmail());
+		final Optional<User> user2 = users.findByEmail(authenticationRequest.getEmail());
 		if(user2.isPresent()) {
 			userRecuperado = user2.get();
 		}
