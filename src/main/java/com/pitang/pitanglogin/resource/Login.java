@@ -1,52 +1,55 @@
 package com.pitang.pitanglogin.resource;
 
-import java.util.Optional;
+import java.time.LocalDate;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pitang.pitanglogin.jwt.CurrentUser;
 import com.pitang.pitanglogin.jwt.JwtAuthenticationRequest;
-import com.pitang.pitanglogin.jwt.JwtTokenUtil;
+import com.pitang.pitanglogin.jwt.TokenUtil;
+import com.pitang.pitanglogin.jwt.UserOfSystem;
+import com.pitang.pitanglogin.model.TokenBlackList;
 import com.pitang.pitanglogin.model.User;
-import com.pitang.pitanglogin.repository.Users;
+import com.pitang.pitanglogin.repository.TokensBlackList;
+import com.pitang.pitanglogin.service.UsersService;
 
 @RestController
 public class Login {
 
 	@Autowired
-	private AuthenticationManager authenticationManager;
+	private TokenUtil tokenUtil;
+	
 	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+	private UsersService userService;
+	
 	@Autowired
-	private UserDetailsService userDetailsService;
-	@Autowired
-	private Users users;
+	private TokensBlackList  tokensBlackList;
 	
 	@PostMapping("/signin")
 	public ResponseEntity<?> signIn(@RequestBody JwtAuthenticationRequest jwtAuthenticationRequest) {
-		User userRecuperado = null;
+		return tokenUtil.returnTokenForUser(jwtAuthenticationRequest);
+	}
+	
+	@GetMapping("/leave") 
+	public ResponseEntity<?> logout(@AuthenticationPrincipal UserOfSystem userOfSystem, 
+			HttpServletRequest request, HttpServletResponse response) {
 		
-		final Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(jwtAuthenticationRequest.getEmail(), jwtAuthenticationRequest.getPassword())
-				);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtAuthenticationRequest.getEmail());
-		final String token = jwtTokenUtil.generatedToken(userDetails);
-		final Optional<User> user = users.findByEmail(jwtAuthenticationRequest.getEmail());
-		if(user.isPresent()) {
-			userRecuperado = user.get();
-		}
-		userRecuperado.setPassword(null);
-		return ResponseEntity.ok(new CurrentUser(token, userRecuperado));
+		String authToken = request.getHeader("Authorization");
+		TokenBlackList tokenBlackList = new TokenBlackList();
+		tokenBlackList.setToken(authToken);
+		tokensBlackList.save(tokenBlackList);
+		
+		User user = userOfSystem.getUser();
+		user.setLastLogin(LocalDate.now());
+		userService.save(user);
+		return ResponseEntity.ok("Logout Successful");
 	}
 }

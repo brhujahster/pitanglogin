@@ -23,11 +23,11 @@ public class User {
 	
 	@NotBlank
 	@Column(name = "first_name")
-	private String first_name;
+	private String firstName;
 	
 	@NotBlank
 	@Column(name = "last_name")
-	private String last_name;
+	private String lastName;
 	
 	@NotBlank
 	private String email;
@@ -36,7 +36,10 @@ public class User {
 	private String password;
 	
 	@Column(name = "created_at")
-	private LocalDate created_at;
+	private LocalDate createdAt;
+	
+	@Column(name = "last_login")
+	private LocalDate lastLogin;
 	
 	@NotNull
 	@OneToMany(mappedBy = "user")
@@ -50,20 +53,36 @@ public class User {
 		this.id = id;
 	}
 
-	public String getFirst_name() {
-		return first_name;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setFirst_name(String first_name) {
-		this.first_name = first_name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public String getLast_name() {
-		return last_name;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setLast_name(String last_name) {
-		this.last_name = last_name;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public LocalDate getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDate createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDate getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(LocalDate lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 
 	public String getEmail() {
@@ -92,14 +111,7 @@ public class User {
 		this.phones = phones;
 	}
 
-	public LocalDate getCreated_at() {
-		return created_at;
-	}
-
-	public void setCreated_at(LocalDate created_at) {
-		this.created_at = created_at;
-	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

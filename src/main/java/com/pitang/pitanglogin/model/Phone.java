@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "phone")
 public class Phone {
@@ -24,6 +26,7 @@ public class Phone {
 	@Column(name = "country_code")
 	private String country_code;
 	
+	@JsonIgnore
 	@ManyToOne
 	private User user;
 
@@ -59,6 +62,14 @@ public class Phone {
 		this.country_code = country_code;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	 
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -85,14 +96,7 @@ public class Phone {
 	  result = prime * result + ((id == null) ? 0 : id.hashCode()); return result;
 	  }
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-	 
+	
 
 	
 	

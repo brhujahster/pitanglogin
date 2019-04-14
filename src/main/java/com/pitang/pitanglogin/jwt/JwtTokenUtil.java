@@ -1,13 +1,21 @@
 package com.pitang.pitanglogin.jwt;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.pitang.pitanglogin.model.TokenBlackList;
+import com.pitang.pitanglogin.repository.TokensBlackList;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -26,6 +34,9 @@ public class JwtTokenUtil implements Serializable{
 	
 	@Value("${jwt.expiration}")
 	private Long expiration;
+	
+	@Autowired
+	private TokensBlackList tokensBlackList;
 	
 	public String getUsernameFromToken(String token) {
 		String username;
@@ -66,8 +77,11 @@ public class JwtTokenUtil implements Serializable{
 		return claims;		
 	}
 	
-	private Boolean isTokenExpired(String token) {
+	public Boolean isTokenExpired(String token) {
 		final Date expiration = getExpirationDataFromToken(token);
+		if(expiration == null) {
+			return true;
+		}
 		return expiration.before(new Date());
 	}
 	
@@ -93,6 +107,7 @@ public class JwtTokenUtil implements Serializable{
 	}
 	
 	
+	
 	public Boolean canTokenBeRefreshed(String token) {
 		return (!isTokenExpired(token));
 	}
@@ -111,15 +126,22 @@ public class JwtTokenUtil implements Serializable{
 		return refreshedToken;
 	}
 	
-	public Boolean validateToken(String token, UserDetails userDetails) {
+	public Boolean validateToken(String token, UserDetails userDetails, HttpServletResponse response) throws IOException {
+		validatedTokenInBlackList(token, response);
+		
 		UserOfSystem user = (UserOfSystem) userDetails;
 		
 		final String username = getUsernameFromToken(token);
-		return (username.equals(user.getUsername()) && !isTokenExpired(token));
+		return username.equals(user.getUsername());
 	}
 	
 	
-	
+	private void validatedTokenInBlackList(String token, HttpServletResponse response) throws IOException {
+		Optional<TokenBlackList> tokenSearched = tokensBlackList.findByToken(token);
+		if(tokenSearched.isPresent()) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized - invalid Token");
+		}
+	}
 	
 	
 	
